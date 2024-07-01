@@ -6,7 +6,14 @@ function doThaThing() {
       )
   ).then((resp) => {
     var data = resp.json().then((data) => {
+      var prevAlbum = data.latestAlbum;
       var currentAlbum = data.currentAlbum;
+
+      document.getElementById(
+        "previous-album-art"
+      ).style.backgroundImage = `url(${prevAlbum.images[1].url})`;
+      document.getElementById("previous-title").innerHTML = prevAlbum.name;
+      document.getElementById("previous-artist").innerHTML = prevAlbum.artist;
 
       document.getElementById(
         "today-album-art"
@@ -34,8 +41,21 @@ function doThaThing() {
         height: 150,
         text: `https://tidal.com/browse/album/${currentAlbum.tidalId}`,
       });
+
+      getWikiData(currentAlbum.wikipediaUrl).then((wikiData) => {
+        document.getElementById("wiki-data").innerHTML = wikiData.extract;
+      });
     });
   });
+}
+
+function getWikiData(wikiUrl) {
+  var wikiTitle = wikiUrl.split("/wiki/")[1];
+  return fetch(
+    `https://en.wikipedia.org/w/api.php?format=json&origin=*&action=query&prop=extracts&explaintext=false&exintro&titles=${wikiTitle}`
+  )
+    .then((resp) => resp.json())
+    .then((data) => data.query.pages[Object.keys(data.query.pages)[0]]);
 }
 
 // definition

@@ -1,33 +1,52 @@
 <html>
   <head>
     <title>Dagens album</title>
-
-    <style rel="style.css"></style>
+    <link rel="stylesheet" href="style.css"></link>
   </head>
   <body>
-    <div class="today-album-container">
-      <div class="today-title-container">
-        <div id="today-title"></div>
-        <div id="today-artist"></div>
+    <div class="wrapper">
+      <div class="previous-album-container">
+        <div class="previous-content-title">Previous album</div>
+        <div class="previous-content-container">
+          <div class="previous-title-container">
+            <div id="previous-title"></div>
+            <div id="previous-artist"></div>
+          </div>
+          <div class="previous-art-container" id="previous-album-art"></div>
+          <div class="previous-rating-container">
+          </div>
+        </div>
       </div>
-      <div class="today-art-container" id="today-album-art"></div>
-      <div class="codes-container">
-        <div class="code-item">
-          <span class="code-title">Spotify</span>
-          <div id="spotifyQR" class="qrcode"></div>
+      <div class="today-album-container">
+          <div class="today-title-container">
+            <div id="today-title"></div>
+            <div id="today-artist"></div>
+          </div>
+          <div class="today-art-container" id="today-album-art"></div>
+        <div class="codes-container">
+          <div class="code-item">
+            <span class="code-title">Spotify</span>
+            <div id="spotifyQR" class="qrcode"></div>
+          </div>
+          <div class="code-item">
+            <span class="code-title">Youtube music</span>
+            <div id="youtubeMusicQR" class="qrcode"></div>
+          </div>
+          <div class="code-item">
+            <span class="code-title">Apple music</span>
+            <div id="appleMusicQR" class="qrcode"></div>
+          </div>
+          <div class="code-item">
+            <span class="code-title">Tidal</span>
+            <div id="tidalQR" class="qrcode"></div>
+          </div>
         </div>
-        <div class="code-item">
-          <span class="code-title">Youtube music</span>
-          <div id="youtubeMusicQR" class="qrcode"></div>
+      </div>
+      <div class="wiki-container">
+        <div class="wiki-title">
+          Wikipedia information
         </div>
-        <div class="code-item">
-          <span class="code-title">Apple music</span>
-          <div id="appleMusicQR" class="qrcode"></div>
-        </div>
-        <div class="code-item">
-          <span class="code-title">Tidal</span>
-          <div id="tidalQR" class="qrcode"></div>
-        </div>
+        <div id="wiki-data"></div>
       </div>
     </div>
   </body>
