@@ -53,6 +53,25 @@
   background-size: cover;
   height: 150px;
   width: 150px;
+  margin-bottom: 1rem;
+}
+
+#previous-rating-container {
+  display: flex;
+  align-items: center;
+}
+
+.star-container {
+  display: flex;
+}
+
+.star-container:not(:last-child) {
+  margin-right: 5px;
+}
+
+.star-svg {
+  height: 30px;
+  width: 30px;
 }
 
 .today-album-container {

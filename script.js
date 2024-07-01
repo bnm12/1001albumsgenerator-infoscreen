@@ -52,6 +52,13 @@ function doThaThing() {
       getWikiData(currentAlbum.wikipediaUrl).then((wikiData) => {
         document.getElementById("wiki-data").innerHTML = wikiData.extract;
       });
+
+      /*document
+        .getElementById("stars-polygon")
+        .setAttribute("points", getStarPoints());*/
+
+      document.getElementById("previous-rating-container").innerHTML =
+        generateStars();
     });
   });
 }
@@ -63,6 +70,65 @@ function getWikiData(wikiUrl) {
   )
     .then((resp) => resp.json())
     .then((data) => data.query.pages[Object.keys(data.query.pages)[0]]);
+}
+
+function generateStars(rating) {
+  var starContent = "";
+
+  for (var i = 0; i < 5; i++) {
+    starContent += `
+    <div class="star-container">
+        <svg class="star-svg">
+        <polygon id="stars-polygon" points="${getStarPoints()}" style="fill-rule: nonzero" />
+      </svg>
+    </div>`;
+  }
+  return starContent;
+}
+
+function getStarPoints() {
+  var starWidth = 30;
+  var starHeight = 30;
+  var centerX = starWidth / 2;
+  var centerY = starHeight / 2;
+
+  var innerCirclePoints = 5; // a 5 point star
+
+  // this.style.starWidth --> this is the beam length of each
+  // side of the SVG square that holds the star
+  var innerRadius = starWidth / innerCirclePoints;
+  var innerOuterRadiusRatio = 2.5; // outter circle is x2 the inner
+  var outerRadius = innerRadius * innerOuterRadiusRatio;
+
+  return calcStarPoints(
+    centerX,
+    centerY,
+    innerCirclePoints,
+    innerRadius,
+    outerRadius
+  );
+}
+
+function calcStarPoints(
+  centerX,
+  centerY,
+  innerCirclePoints,
+  innerRadius,
+  outerRadius
+) {
+  const angle = Math.PI / innerCirclePoints;
+  var angleOffsetToCenterStar = 60;
+
+  var totalPoints = innerCirclePoints * 2; // 10 in a 5-points star
+  var points = "";
+  for (let i = 0; i < totalPoints; i++) {
+    var isEvenIndex = i % 2 == 0;
+    var r = isEvenIndex ? outerRadius : innerRadius;
+    var currX = centerX + Math.cos(i * angle + angleOffsetToCenterStar) * r;
+    var currY = centerY + Math.sin(i * angle + angleOffsetToCenterStar) * r;
+    points += currX + "," + currY + " ";
+  }
+  return points;
 }
 
 // definition
