@@ -130,4 +130,5 @@
 #wiki-data {
   font-size: 1.2rem;
   overflow: scroll;
+  height: 100%;
 }
