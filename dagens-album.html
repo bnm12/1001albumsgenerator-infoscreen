@@ -1,0 +1,129 @@
+<html>
+<head>
+<title>Dagens album</title>
+
+<style>
+.today-album-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.today-title-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 20px;
+}
+#today-title {
+  font-size: 4rem;
+}
+
+#today-artist {
+  font-size: 2rem;
+}
+
+.today-art-container {
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 640px;
+  width: 640px;
+  margin-bottom: 20px;
+}
+
+.codes-container {
+  display: flex;
+}
+
+.code-item {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 4px;
+  border: 1px solid #eaeaea;
+  border-radius: 20px 20px
+}
+
+.code-title {
+  font-size: 2rem;
+  padding: 1rem 0;
+}
+
+.qrcode {
+   padding-bottom: 1rem
+}
+</style>
+</head>
+<body>
+<div class="today-album-container">
+  <div class="today-title-container">
+    <div id="today-title"></div>
+    <div id="today-artist"></div>
+  </div>
+  <div class="today-art-container" id="today-album-art"></div>
+  <div class="codes-container">
+    <div class="code-item">
+      <span class="code-title">Spotify</span>
+      <div id="spotifyQR" class="qrcode"></div>
+    </div>
+    <div class="code-item">
+      <span class="code-title">Youtube music</span>
+      <div id="youtubeMusicQR" class="qrcode"></div>
+    </div>
+    <div class="code-item">
+      <span class="code-title">Apple music</span>
+      <div id="appleMusicQR" class="qrcode"></div>
+    </div>
+    <div class="code-item">
+      <span class="code-title">Tidal</span>
+      <div id="tidalQR" class="qrcode"></div>
+    </div>
+  </div>
+</div>
+</body>
+
+<script>
+function doThaThing(){
+var groupData = fetch('https://corsproxy.io/?' + encodeURIComponent('https://1001albumsgenerator.com/api/v1/groups/ewii-musik-norderi')).then(resp => {
+  var data = resp.json().then(data => {
+    var currentAlbum = data.currentAlbum;
+    
+    document.getElementById('today-album-art').style.backgroundImage = `url(${currentAlbum.images[0].url})`;
+    document.getElementById('today-title').innerHTML = currentAlbum.name;
+    document.getElementById('today-artist').innerHTML = currentAlbum.artist;
+   
+    var spotifyQR = new QRCode("spotifyQR", {width: 150, height: 150, text: `https://open.spotify.com/album/${currentAlbum.spotifyId}`});
+    var youtubeMusicQR = new QRCode("youtubeMusicQR", {width: 150, height: 150, text: `https://music.youtube.com/playlist?list=${currentAlbum.youtubeMusicId}`});
+    var appleMusicQR = new QRCode("appleMusicQR", {width: 150, height: 150, text: `https://music.apple.com/album/${currentAlbum.appleMusicId}`});
+    var tidalQR = new QRCode("tidalQR", {width: 150, height: 150, text: `https://tidal.com/browse/album/${currentAlbum.tidalId}`});
+  });
+});
+}
+
+// definition
+function loadScript(scriptUrl) {
+  const script = document.createElement('script');
+  script.src = scriptUrl;
+  document.body.appendChild(script);
+  
+  return new Promise((res, rej) => {
+    script.onload = function() {
+      res();
+    }
+    script.onerror = function () {
+      rej();
+    }
+  });
+}
+
+// use
+loadScript('http://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js')
+  .then(doThaThing)
+  .catch(() => {
+    console.error('Script loading failed! Handle this error');
+  });
+</script>
+
+</html>
