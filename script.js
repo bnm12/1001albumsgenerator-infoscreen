@@ -1,6 +1,11 @@
 function doThaThing() {
   var urlParams = new URLSearchParams(window.location.search);
   var groupSlug = urlParams.get("group");
+
+  if (!groupSlug) {
+    alert("Please add a ?group=<your-group-name> to the url");
+  }
+
   var groupData = fetch(
     "https://corsproxy.io/?" +
       encodeURIComponent(
