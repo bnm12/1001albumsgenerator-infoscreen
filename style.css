@@ -1,0 +1,50 @@
+.today-album-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.today-title-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 20px;
+}
+#today-title {
+  font-size: 4rem;
+}
+
+#today-artist {
+  font-size: 2rem;
+}
+
+.today-art-container {
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 640px;
+  width: 640px;
+  margin-bottom: 20px;
+}
+
+.codes-container {
+  display: flex;
+}
+
+.code-item {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 4px;
+  border: 1px solid #eaeaea;
+  border-radius: 20px 20px;
+}
+
+.code-title {
+  font-size: 2rem;
+  padding: 1rem 0;
+}
+
+.qrcode {
+  padding-bottom: 1rem;
+}
