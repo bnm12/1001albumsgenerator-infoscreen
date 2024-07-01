@@ -129,6 +129,6 @@
 
 #wiki-data {
   font-size: 1.2rem;
-  overflow: scroll;
+  overflow: auto;
   height: 100%;
 }
