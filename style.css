@@ -36,7 +36,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 20px;
+  padding-bottom: 1rem;
   text-align: center;
 }
 
@@ -66,7 +66,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 20px;
+  padding-bottom: 2rem;
   text-align: center;
 }
 
@@ -97,7 +97,7 @@
   align-items: center;
   margin: 4px;
   border: 1px solid #a1a1a1;
-  border-radius: 20px 20px;
+  border-radius: 0.5rem;
 }
 
 .code-title {

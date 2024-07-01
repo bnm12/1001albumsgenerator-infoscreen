@@ -1,8 +1,10 @@
 function doThaThing() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var groupSlug = urlParams.get("group");
   var groupData = fetch(
     "https://corsproxy.io/?" +
       encodeURIComponent(
-        "https://1001albumsgenerator.com/api/v1/groups/ewii-musik-norderi"
+        `https://1001albumsgenerator.com/api/v1/groups/${groupSlug}`
       )
   ).then((resp) => {
     var data = resp.json().then((data) => {
