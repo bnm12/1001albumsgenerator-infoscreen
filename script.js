@@ -53,12 +53,10 @@ function doThaThing() {
         document.getElementById("wiki-data").innerHTML = wikiData.extract;
       });
 
-      /*document
-        .getElementById("stars-polygon")
-        .setAttribute("points", getStarPoints());*/
-
+      var rating = "";
       document.getElementById("previous-rating-container").innerHTML =
-        generateStars();
+        generateStars(rating);
+      document.getElementById("previous-rating-numerical").innerHTML = rating;
     });
   });
 }
@@ -73,15 +71,53 @@ function getWikiData(wikiUrl) {
 }
 
 function generateStars(rating) {
+  if (!rating) return "";
+  var workingRating = rating;
+
   var starContent = "";
 
   for (var i = 0; i < 5; i++) {
+    var currentRating = workingRating >= 1 ? 1 : workingRating;
+    var percent = currentRating * 100;
+
     starContent += `
     <div class="star-container">
-        <svg class="star-svg">
+        <svg class="star-svg" style="fill: url('#gradient${i}')">
         <polygon id="stars-polygon" points="${getStarPoints()}" style="fill-rule: nonzero" />
+        <defs>
+          <!--
+			id has to be unique to each star fullness(dynamic offset) - it indicates fullness above
+		    -->
+          <linearGradient id="gradient${i}">
+            <stop
+              id="stop1"
+              offset="${percent}%"
+              stop-opacity="1"
+              stop-color="#ed8a19"
+            ></stop>
+            <stop
+              id="stop2"
+              offset="${percent}%"
+              stop-opacity="0"
+              stop-color="#ed8a19"
+            ></stop>
+            <stop
+              id="stop3"
+              offset="${percent}%"
+              stop-opacity="1"
+              stop-color="#737373"
+            ></stop>
+            <stop
+              id="stop4"
+              offset="100%"
+              stop-opacity="1"
+              stop-color="#737373"
+            ></stop>
+          </linearGradient>
+        </defs>
       </svg>
     </div>`;
+    workingRating = Math.max(workingRating - 1, 0);
   }
   return starContent;
 }
