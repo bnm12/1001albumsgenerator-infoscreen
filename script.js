@@ -53,10 +53,10 @@ function doThaThing() {
         document.getElementById("wiki-data").innerHTML = wikiData.extract;
       });
 
-      var rating = "";
       document.getElementById("previous-rating-container").innerHTML =
-        generateStars(rating);
-      document.getElementById("previous-rating-numerical").innerHTML = rating;
+        generateStars(prevAlbum.averageRating);
+      document.getElementById("previous-rating-numerical").innerHTML =
+        prevAlbum.averageRating;
     });
   });
 }
