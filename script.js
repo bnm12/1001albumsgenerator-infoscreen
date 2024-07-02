@@ -9,7 +9,7 @@ function doThaThing() {
   var groupData = fetch(
     "https://corsproxy.io/?" +
       encodeURIComponent(
-        `https://1001albumsgenerator.com/api/v1/groups/${groupSlug}?${Math.floor(new Date().getTime() / 1000)}`
+        `https://1001albumsgenerator.com/api/v1/groups/${groupSlug}?${Math.floor(new Date().getTime() / 1000 / 60)}`
       )
   ).then((resp) => {
     var data = resp.json().then((data) => {
