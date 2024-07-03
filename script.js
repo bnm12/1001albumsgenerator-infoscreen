@@ -22,13 +22,13 @@ function doThaThing() {
         "previous-album-art"
       ).style.backgroundImage = `url(${prevAlbum.images[1].url})`;
       document.getElementById("previous-title").innerHTML = prevAlbum.name;
-      document.getElementById("previous-artist").innerHTML = prevAlbum.artist;
-
+      document.getElementById("previous-artist").innerHTML = `${prevAlbum.artist} (${prevAlbum.releaseDate})`;
+	    
       document.getElementById(
         "today-album-art"
       ).style.backgroundImage = `url(${currentAlbum.images[0].url})`;
       document.getElementById("today-title").innerHTML = currentAlbum.name;
-      document.getElementById("today-artist").innerHTML = currentAlbum.artist;
+      document.getElementById("today-artist").innerHTML = `${currentAlbum.artist} (${currentAlbum.releaseDate})`;
 
       var spotifyQR = new QRCode("spotifyQR", {
         width: 150,
