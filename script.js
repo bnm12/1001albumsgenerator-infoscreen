@@ -9,7 +9,9 @@ if (!groupSlug) {
 function doThaThing() {
   var timer = parseInt(refreshTimerString, 10);
   updateData();
-  setInterval(updateData, timer * 1000);
+  if (timer) {
+    setInterval(updateData, timer * 1000);
+  }
 }
 
 function updateData() {
@@ -29,34 +31,19 @@ function updateData() {
         "previous-album-art"
       ).style.backgroundImage = `url(${prevAlbum.images[1].url})`;
       document.getElementById("previous-title").innerHTML = prevAlbum.name;
-      document.getElementById("previous-artist").innerHTML = `${prevAlbum.artist} (${prevAlbum.releaseDate})`;
-	    
+      document.getElementById(
+        "previous-artist"
+      ).innerHTML = `${prevAlbum.artist} (${prevAlbum.releaseDate})`;
+
       document.getElementById(
         "today-album-art"
       ).style.backgroundImage = `url(${currentAlbum.images[0].url})`;
       document.getElementById("today-title").innerHTML = currentAlbum.name;
-      document.getElementById("today-artist").innerHTML = `${currentAlbum.artist} (${currentAlbum.releaseDate})`;
+      document.getElementById(
+        "today-artist"
+      ).innerHTML = `${currentAlbum.artist} (${currentAlbum.releaseDate})`;
 
-      var spotifyQR = new QRCode("spotifyQR", {
-        width: 150,
-        height: 150,
-        text: `https://open.spotify.com/album/${currentAlbum.spotifyId}`,
-      });
-      var youtubeMusicQR = new QRCode("youtubeMusicQR", {
-        width: 150,
-        height: 150,
-        text: `https://music.youtube.com/playlist?list=${currentAlbum.youtubeMusicId}`,
-      });
-      var appleMusicQR = new QRCode("appleMusicQR", {
-        width: 150,
-        height: 150,
-        text: `https://music.apple.com/album/${currentAlbum.appleMusicId}`,
-      });
-      var tidalQR = new QRCode("tidalQR", {
-        width: 150,
-        height: 150,
-        text: `https://tidal.com/browse/album/${currentAlbum.tidalId}`,
-      });
+      makeQRCodes(currentAlbum);
 
       getWikiData(currentAlbum.wikipediaUrl).then((wikiData) => {
         document.getElementById("wiki-data").innerHTML = wikiData.extract;
@@ -67,6 +54,33 @@ function updateData() {
       document.getElementById("previous-rating-numerical").innerHTML =
         prevAlbum.averageRating || "";
     });
+  });
+}
+
+function makeQRCodes(currentAlbum) {
+  document.getElementById("spotifyQR").innerHTML = "";
+  var spotifyQR = new QRCode("spotifyQR", {
+    width: 150,
+    height: 150,
+    text: `https://open.spotify.com/album/${currentAlbum.spotifyId}`,
+  });
+  document.getElementById("youtubeMusicQR").innerHTML = "";
+  var youtubeMusicQR = new QRCode("youtubeMusicQR", {
+    width: 150,
+    height: 150,
+    text: `https://music.youtube.com/playlist?list=${currentAlbum.youtubeMusicId}`,
+  });
+  document.getElementById("appleMusicQR").innerHTML = "";
+  var appleMusicQR = new QRCode("appleMusicQR", {
+    width: 150,
+    height: 150,
+    text: `https://music.apple.com/album/${currentAlbum.appleMusicId}`,
+  });
+  document.getElementById("tidalQR").innerHTML = "";
+  var tidalQR = new QRCode("tidalQR", {
+    width: 150,
+    height: 150,
+    text: `https://tidal.com/browse/album/${currentAlbum.tidalId}`,
   });
 }
 
