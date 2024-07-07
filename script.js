@@ -1,11 +1,18 @@
+var urlParams = new URLSearchParams(window.location.search);
+var groupSlug = urlParams.get("group");
+var refreshTimerString = urlParams.get("refreshTimer");
+
+if (!groupSlug) {
+  alert("Please add a ?group=<your-group-name> to the url");
+}
+
 function doThaThing() {
-  var urlParams = new URLSearchParams(window.location.search);
-  var groupSlug = urlParams.get("group");
+  var timer = parseInt(refreshTimerString, 10);
+  updateData();
+  setInterval(updateData, timer * 1000);
+}
 
-  if (!groupSlug) {
-    alert("Please add a ?group=<your-group-name> to the url");
-  }
-
+function updateData() {
   var groupData = fetch(
     "https://corsproxy.io/?" +
       encodeURIComponent(
