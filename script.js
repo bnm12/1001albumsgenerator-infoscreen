@@ -87,7 +87,7 @@ function makeQRCodes(currentAlbum) {
 function getWikiData(wikiUrl) {
   var wikiTitle = wikiUrl.split("/wiki/")[1];
   return fetch(
-    `https://en.wikipedia.org/w/api.php?format=json&origin=*&action=query&prop=extracts&explaintext=false&exintro&titles=${wikiTitle}`
+    `https://en.wikipedia.org/w/api.php?format=json&origin=*&action=query&prop=extracts&explaintext=false&exintro&titles=${encodeURIComponent(wikiTitle)}&redirects`
   )
     .then((resp) => resp.json())
     .then((data) => data.query.pages[Object.keys(data.query.pages)[0]]);
