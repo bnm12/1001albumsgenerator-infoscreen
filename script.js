@@ -8,6 +8,7 @@ if (!groupSlug) {
 
 function doThaThing() {
   var timer = parseInt(refreshTimerString, 10);
+  var bigReload = setTimeout(window.location.reload, 12*60*60*1000);
   updateData();
   if (timer) {
     setInterval(updateData, timer * 1000);
@@ -87,7 +88,7 @@ function makeQRCodes(currentAlbum) {
 function getWikiData(wikiUrl) {
   var wikiTitle = wikiUrl.split("/wiki/")[1];
   return fetch(
-    `https://en.wikipedia.org/w/api.php?format=json&origin=*&action=query&prop=extracts&explaintext=false&exintro&titles=${encodeURIComponent(wikiTitle)}&redirects`
+    `https://en.wikipedia.org/w/api.php?format=json&origin=*&action=query&prop=extracts&explaintext=false&exintro&titles=${wikiTitle}&redirects`
   )
     .then((resp) => resp.json())
     .then((data) => data.query.pages[Object.keys(data.query.pages)[0]]);
