@@ -19,7 +19,7 @@ function doThaThing() {
         console.warn("Initial attempt by fetchAlbumStats failed (retries will continue internally):", error.message ? error.message : error);
     })
     .finally(() => {
-      updateData();
+      setTimeout(updateData, 1000);
       if (timer) {
         setInterval(updateData, timer * 1000);
       }
@@ -107,7 +107,7 @@ function updateProgressDisplay(groupData, albumStatsData) {
     return;
   }
 
-  if (!groupData || !groupData.stats || !albumStatsData || !albumStatsData.albums) {
+  if (!groupData || !albumStatsData || !albumStatsData.albums) {
     console.warn("Missing data for progress display. Clearing progress.");
     progressBarFilled.style.width = '0%';
     progressBarFilled.style.background = '#737373';
@@ -115,7 +115,7 @@ function updateProgressDisplay(groupData, albumStatsData) {
     return;
   }
 
-  const generatedAlbumsCount = groupData.stats.numberOfGeneratedAlbums + 1;
+  const generatedAlbumsCount = groupData.numberOfGeneratedAlbums + 1;
   const totalAlbumsCount = albumStatsData.albums.length;
 
   let progressPercentage = 0;
