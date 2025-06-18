@@ -47,6 +47,12 @@ function updateData() {
         document.getElementById("wiki-data").innerHTML = wikiData.extract;
       });
 
+      const wikiLink = document.getElementById("wiki-link");
+      if (wikiLink) {
+        wikiLink.setAttribute("href", currentAlbum.wikipediaUrl);
+        wikiLink.setAttribute("target", "_blank");
+      }
+
       document.getElementById("previous-rating-container").innerHTML =
         generateStars(prevAlbum.averageRating);
       document.getElementById("previous-rating-numerical").innerHTML =
