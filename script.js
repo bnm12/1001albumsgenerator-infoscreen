@@ -1,3 +1,4 @@
+var albumStats = null;
 var urlParams = new URLSearchParams(window.location.search);
 var groupSlug = urlParams.get("group");
 var refreshTimerString = urlParams.get("refreshTimer");
@@ -8,11 +9,42 @@ if (!groupSlug) {
 
 function doThaThing() {
   var timer = parseInt(refreshTimerString, 10);
-  var bigReload = setTimeout(window.location.reload, 12*60*60*1000);
-  updateData();
-  if (timer) {
-    setInterval(updateData, timer * 1000);
-  }
+  var bigReload = setTimeout(window.location.reload, 12 * 60 * 60 * 1000);
+
+  fetchAlbumStats()
+    .catch(error => {
+        // This catch is primarily to prevent an "Uncaught (in promise)" error message in the console
+        // from the very first attempt if fetchAlbumStats fails and propagates the error.
+        // Retries are handled by fetchAlbumStats itself.
+        console.warn("Initial attempt by fetchAlbumStats failed (retries will continue internally):", error.message ? error.message : error);
+    })
+    .finally(() => {
+      updateData();
+      if (timer) {
+        setInterval(updateData, timer * 1000);
+      }
+    });
+}
+
+function fetchAlbumStats() {
+  console.log("Attempting to fetch album stats...");
+  return fetch(`https://1001albumsgenerator.com/api/v1/albums/stats?cacheBuster=${new Date().getTime()}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Network response was not ok for album stats: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then(statsData => {
+      albumStats = statsData;
+      console.log("Album stats populated successfully.");
+    })
+    .catch(error => {
+      console.error("fetchAlbumStats failed, scheduling retry:", error);
+      setTimeout(fetchAlbumStats, 60000);
+      // Propagate error for external .catch handlers after scheduling retry.
+      return Promise.reject(error);
+    });
 }
 
 function updateData() {
@@ -57,8 +89,51 @@ function updateData() {
         generateStars(prevAlbum.averageRating);
       document.getElementById("previous-rating-numerical").innerHTML =
         prevAlbum.averageRating || "";
+
+      // Update progress display if albumStats is available
+      if (albumStats) {
+        updateProgressDisplay(data, albumStats);
+      }
     });
   });
+}
+
+function updateProgressDisplay(groupData, albumStatsData) {
+  const progressBarFilled = document.getElementById('progress-bar-filled');
+  const progressText = document.getElementById('progress-text');
+
+  if (!progressBarFilled || !progressText) {
+    console.error("Progress bar elements not found");
+    return;
+  }
+
+  if (!groupData || !groupData.stats || !albumStatsData || !albumStatsData.albums) {
+    console.warn("Missing data for progress display. Clearing progress.");
+    progressBarFilled.style.width = '0%';
+    progressBarFilled.style.background = '#737373';
+    progressText.textContent = 'N/A';
+    return;
+  }
+
+  const generatedAlbumsCount = groupData.stats.numberOfGeneratedAlbums + 1;
+  const totalAlbumsCount = albumStatsData.albums.length;
+
+  let progressPercentage = 0;
+  if (totalAlbumsCount > 0) {
+    progressPercentage = (generatedAlbumsCount / totalAlbumsCount) * 100;
+  }
+
+  progressBarFilled.style.width = progressPercentage + '%';
+  // Ensure the gradient visually represents the progress correctly
+  if (progressPercentage > 0 && progressPercentage < 100) {
+    progressBarFilled.style.background = `linear-gradient(to right, #ed8a19 ${progressPercentage}%, #737373 ${progressPercentage}%)`;
+  } else if (progressPercentage >= 100) {
+    progressBarFilled.style.background = '#ed8a19';
+  } else {
+    progressBarFilled.style.background = '#737373';
+  }
+
+  progressText.textContent = generatedAlbumsCount + '/' + totalAlbumsCount + ' (' + progressPercentage.toFixed(2) + '%)';
 }
 
 function makeQRCodes(currentAlbum) {
@@ -190,12 +265,9 @@ function getStarPoints() {
   var centerX = starWidth / 2;
   var centerY = starHeight / 2;
 
-  var innerCirclePoints = 5; // a 5 point star
-
-  // this.style.starWidth --> this is the beam length of each
-  // side of the SVG square that holds the star
+  var innerCirclePoints = 5;
   var innerRadius = starWidth / innerCirclePoints;
-  var innerOuterRadiusRatio = 2.5; // outter circle is x2 the inner
+  var innerOuterRadiusRatio = 2.5;
   var outerRadius = innerRadius * innerOuterRadiusRatio;
 
   return calcStarPoints(
@@ -216,8 +288,7 @@ function calcStarPoints(
 ) {
   const angle = Math.PI / innerCirclePoints;
   var angleOffsetToCenterStar = 60;
-
-  var totalPoints = innerCirclePoints * 2; // 10 in a 5-points star
+  var totalPoints = innerCirclePoints * 2;
   var points = "";
   for (let i = 0; i < totalPoints; i++) {
     var isEvenIndex = i % 2 == 0;
@@ -229,7 +300,6 @@ function calcStarPoints(
   return points;
 }
 
-// definition
 function loadScript(scriptUrl) {
   const script = document.createElement("script");
   script.src = scriptUrl;
@@ -245,7 +315,6 @@ function loadScript(scriptUrl) {
   });
 }
 
-// use
 loadScript("https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js")
   .then(doThaThing)
   .catch(() => {
