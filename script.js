@@ -124,14 +124,6 @@ function updateProgressDisplay(groupData, albumStatsData) {
   }
 
   progressBarFilled.style.width = progressPercentage + '%';
-  // Ensure the gradient visually represents the progress correctly
-  if (progressPercentage > 0 && progressPercentage < 100) {
-    progressBarFilled.style.background = `linear-gradient(to right, #ed8a19 ${progressPercentage}%, #737373 ${progressPercentage}%)`;
-  } else if (progressPercentage >= 100) {
-    progressBarFilled.style.background = '#ed8a19';
-  } else {
-    progressBarFilled.style.background = '#737373';
-  }
 
   progressText.textContent = generatedAlbumsCount + '/' + totalAlbumsCount + ' (' + progressPercentage.toFixed(2) + '%)';
 }
