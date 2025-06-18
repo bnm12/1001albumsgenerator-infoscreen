@@ -110,7 +110,6 @@ function updateProgressDisplay(groupData, albumStatsData) {
   if (!groupData || !albumStatsData || !albumStatsData.albums) {
     console.warn("Missing data for progress display. Clearing progress.");
     progressBarFilled.style.width = '0%';
-    progressBarFilled.style.background = '#737373';
     progressText.textContent = 'N/A';
     return;
   }
