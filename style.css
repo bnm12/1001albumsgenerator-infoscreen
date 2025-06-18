@@ -120,6 +120,7 @@
   margin: 4px;
   border: 1px solid #a1a1a1;
   border-radius: 0.5rem;
+  cursor: pointer;
 }
 
 .code-title {
@@ -147,6 +148,14 @@
   text-align: center;
   margin-bottom: 1rem;
   border-bottom: 1px solid #a1a1a1;
+}
+
+#wiki-link:hover .wiki-container {
+  border-color: #555;
+}
+
+#wiki-link {
+  cursor: pointer;
 }
 
 #wiki-data {
