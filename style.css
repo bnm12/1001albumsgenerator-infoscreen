@@ -150,7 +150,7 @@
   border-bottom: 1px solid #a1a1a1;
 }
 
-#wiki-link:hover .wiki-container {
+#wiki-link:hover .wiki-title {
   border-color: #555;
 }
 
