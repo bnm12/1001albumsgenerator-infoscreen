@@ -62,24 +62,59 @@ function makeQRCodes(currentAlbum) {
     height: 150,
     text: `https://open.spotify.com/album/${currentAlbum.spotifyId}`,
   });
+  var spotifyElement = document.getElementById("spotifyQR");
+  var spotifyCodeItem = spotifyElement.closest('.code-item');
+  var spotifyUrl = `https://open.spotify.com/album/${currentAlbum.spotifyId}`;
+  if (spotifyCodeItem) {
+    spotifyCodeItem.addEventListener('click', function() {
+      window.open(spotifyUrl, '_blank');
+    });
+  }
+
   document.getElementById("youtubeMusicQR").innerHTML = "";
   var youtubeMusicQR = new QRCode("youtubeMusicQR", {
     width: 150,
     height: 150,
     text: `https://music.youtube.com/playlist?list=${currentAlbum.youtubeMusicId}`,
   });
+  var youtubeMusicElement = document.getElementById("youtubeMusicQR");
+  var youtubeMusicCodeItem = youtubeMusicElement.closest('.code-item');
+  var youtubeMusicUrl = `https://music.youtube.com/playlist?list=${currentAlbum.youtubeMusicId}`;
+  if (youtubeMusicCodeItem) {
+    youtubeMusicCodeItem.addEventListener('click', function() {
+      window.open(youtubeMusicUrl, '_blank');
+    });
+  }
+
   document.getElementById("appleMusicQR").innerHTML = "";
   var appleMusicQR = new QRCode("appleMusicQR", {
     width: 150,
     height: 150,
     text: `https://music.apple.com/album/${currentAlbum.appleMusicId}`,
   });
+  var appleMusicElement = document.getElementById("appleMusicQR");
+  var appleMusicCodeItem = appleMusicElement.closest('.code-item');
+  var appleMusicUrl = `https://music.apple.com/album/${currentAlbum.appleMusicId}`;
+  if (appleMusicCodeItem) {
+    appleMusicCodeItem.addEventListener('click', function() {
+      window.open(appleMusicUrl, '_blank');
+    });
+  }
+
   document.getElementById("tidalQR").innerHTML = "";
   var tidalQR = new QRCode("tidalQR", {
     width: 150,
     height: 150,
     text: `https://tidal.com/browse/album/${currentAlbum.tidalId}`,
   });
+  var tidalElement = document.getElementById("tidalQR");
+  var tidalCodeItem = tidalElement.closest('.code-item');
+  var tidalUrl = `https://tidal.com/browse/album/${currentAlbum.tidalId}`;
+  if (tidalCodeItem) {
+    tidalCodeItem.addEventListener('click', function() {
+      window.open(tidalUrl, '_blank');
+    });
+  }
 }
 
 function getWikiData(wikiUrl) {
