@@ -19,7 +19,7 @@ function doThaThing() {
         console.warn("Initial attempt by fetchAlbumStats failed (retries will continue internally):", error.message ? error.message : error);
     })
     .finally(() => {
-      setTimeout(updateData, 6000);
+      setTimeout(updateData, 11 * 1000);
       if (timer) {
         setInterval(updateData, timer * 1000);
       }
