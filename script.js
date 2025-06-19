@@ -1,3 +1,4 @@
+let globalGroupData = null;
 var albumStats = null;
 var urlParams = new URLSearchParams(window.location.search);
 var groupSlug = urlParams.get("group");
@@ -11,19 +12,16 @@ function doThaThing() {
   var timer = parseInt(refreshTimerString, 10);
   var bigReload = setTimeout(window.location.reload, 12 * 60 * 60 * 1000);
 
-  fetchAlbumStats()
-    .catch(error => {
-        // This catch is primarily to prevent an "Uncaught (in promise)" error message in the console
-        // from the very first attempt if fetchAlbumStats fails and propagates the error.
-        // Retries are handled by fetchAlbumStats itself.
-        console.warn("Initial attempt by fetchAlbumStats failed (retries will continue internally):", error.message ? error.message : error);
+  updateData()
+    .then(() => {
+      setTimeout(fetchAlbumStats, 11 * 1000);
     })
-    .finally(() => {
-      setTimeout(updateData, 11 * 1000);
-      if (timer) {
-        setInterval(updateData, timer * 1000);
-      }
+    .catch(error => {
+      console.error("Error during initial data load or scheduling:", error);
     });
+
+  // The setInterval for periodic updates will be moved to updateData itself.
+  // The initial fetchAlbumStats call and its finally block are removed.
 }
 
 function fetchAlbumStats() {
@@ -38,93 +36,125 @@ function fetchAlbumStats() {
     .then(statsData => {
       albumStats = statsData;
       console.log("Album stats populated successfully.");
+      updateProgressDisplay();
     })
     .catch(error => {
-      console.error("fetchAlbumStats failed, scheduling retry:", error);
+      console.error("fetchAlbumStats failed, scheduling retry:", error.message ? error.message : error);
       setTimeout(fetchAlbumStats, 60000);
-      // Propagate error for external .catch handlers after scheduling retry.
       return Promise.reject(error);
     });
 }
 
 function updateData() {
-  var groupData = fetch(
-        `https://1001albumsgenerator.com/api/v1/groups/${groupSlug}?${Math.floor(
+  return fetch(
+        `https://1001albumsgenerator.com/api/v1/groups/${groupSlug}?cacheBuster=${Math.floor(
           new Date().getTime() / 1000 / 60
         )}`
-  ).then((resp) => {
-    var data = resp.json().then((data) => {
-      var prevAlbum = data.latestAlbum;
-      var currentAlbum = data.currentAlbum;
+  )
+  .then(resp => {
+    if (!resp.ok) {
+      throw new Error(`Network response was not ok for group data: ${resp.status} ${resp.statusText}`);
+    }
+    return resp.json();
+  })
+  .then(data => {
+    globalGroupData = data;
 
-      document.getElementById(
-        "previous-album-art"
-      ).style.backgroundImage = `url(${prevAlbum.images[1].url})`;
-      document.getElementById("previous-title").innerHTML = prevAlbum.name;
-      document.getElementById(
-        "previous-artist"
-      ).innerHTML = `${prevAlbum.artist} (${prevAlbum.releaseDate})`;
+    var prevAlbum = data.latestAlbum;
+    var currentAlbum = data.currentAlbum;
 
-      document.getElementById(
-        "today-album-art"
-      ).style.backgroundImage = `url(${currentAlbum.images[0].url})`;
-      document.getElementById("today-title").innerHTML = currentAlbum.name;
-      document.getElementById(
-        "today-artist"
-      ).innerHTML = `${currentAlbum.artist} (${currentAlbum.releaseDate})`;
+    document.getElementById(
+      "previous-album-art"
+    ).style.backgroundImage = `url(${prevAlbum.images[1].url})`;
+    document.getElementById("previous-title").innerHTML = prevAlbum.name;
+    document.getElementById(
+      "previous-artist"
+    ).innerHTML = `${prevAlbum.artist} (${prevAlbum.releaseDate})`;
 
-      makeQRCodes(currentAlbum);
+    document.getElementById(
+      "today-album-art"
+    ).style.backgroundImage = `url(${currentAlbum.images[0].url})`;
+    document.getElementById("today-title").innerHTML = currentAlbum.name;
+    document.getElementById(
+      "today-artist"
+    ).innerHTML = `${currentAlbum.artist} (${currentAlbum.releaseDate})`;
 
-      getWikiData(currentAlbum.wikipediaUrl).then((wikiData) => {
+    makeQRCodes(currentAlbum);
+
+    getWikiData(currentAlbum.wikipediaUrl).then(wikiData => {
+      if (wikiData && wikiData.extract) {
         document.getElementById("wiki-data").innerHTML = wikiData.extract;
-      });
-
-      const wikiLink = document.getElementById("wiki-link");
-      if (wikiLink) {
-        wikiLink.setAttribute("href", currentAlbum.wikipediaUrl);
-        wikiLink.setAttribute("target", "_blank");
+      } else {
+        document.getElementById("wiki-data").innerHTML = "Could not load Wikipedia data.";
+        console.warn("Wikipedia data extract was missing:", wikiData);
       }
-
-      document.getElementById("previous-rating-container").innerHTML =
-        generateStars(prevAlbum.averageRating);
-      document.getElementById("previous-rating-numerical").innerHTML =
-        prevAlbum.averageRating || "";
-
-      // Update progress display if albumStats is available
-      if (albumStats) {
-        updateProgressDisplay(data, albumStats);
-      }
+    }).catch(error => {
+        document.getElementById("wiki-data").innerHTML = "Error loading Wikipedia data.";
+        console.error("Error fetching Wikipedia data:", error);
     });
+
+    const wikiLink = document.getElementById("wiki-link");
+    if (wikiLink) {
+      wikiLink.setAttribute("href", currentAlbum.wikipediaUrl);
+      wikiLink.setAttribute("target", "_blank");
+    }
+
+    document.getElementById("previous-rating-container").innerHTML =
+      generateStars(prevAlbum.averageRating);
+    document.getElementById("previous-rating-numerical").innerHTML =
+      prevAlbum.averageRating || "";
+
+    updateProgressDisplay();
+
+    // Set up the interval timer for subsequent updates, only once.
+    // Check if a timer value is provided and if an interval hasn't been set yet.
+    // A simple way to check if interval is set is to have a flag.
+    if (typeof updateData.intervalId === 'undefined') {
+        var timer = parseInt(refreshTimerString, 10);
+        if (timer) {
+            updateData.intervalId = setInterval(updateData, timer * 1000);
+        }
+    }
+  })
+  .catch(error => {
+    console.error("Error in updateData:", error);
+    throw error; // Re-throw to allow .catch in doThaThing if needed
   });
 }
 
-function updateProgressDisplay(groupData, albumStatsData) {
+function updateProgressDisplay() {
+  const progressTitleElement = document.getElementById('progress-title-text');
+  const progressBarContainer = document.querySelector('.progress-bar-container');
   const progressBarFilled = document.getElementById('progress-bar-filled');
   const progressText = document.getElementById('progress-text');
+  const loadingSpinner = document.getElementById('loading-spinner');
 
-  if (!progressBarFilled || !progressText) {
-    console.error("Progress bar elements not found");
+  if (!progressTitleElement || !progressBarContainer || !progressBarFilled || !progressText || !loadingSpinner) {
+    console.error("One or more progress display elements are missing from the DOM.");
     return;
   }
 
-  if (!groupData || !albumStatsData || !albumStatsData.albums) {
-    console.warn("Missing data for progress display. Clearing progress.");
-    progressBarFilled.style.width = '0%';
-    progressText.textContent = 'N/A';
-    return;
+  if (!globalGroupData || !albumStats || !albumStats.albums || albumStats.albums.length === 0) {
+    progressTitleElement.textContent = 'Progress loading';
+    if(progressBarContainer) progressBarContainer.style.display = 'none';
+    progressText.textContent = '';
+    loadingSpinner.style.display = 'inline-block';
+  } else {
+    progressTitleElement.textContent = 'Total progress';
+    if(progressBarContainer) progressBarContainer.style.display = 'block';
+    loadingSpinner.style.display = 'none';
+
+    const generatedAlbumsCount = globalGroupData.numberOfGeneratedAlbums + 1;
+    const totalAlbumsCount = albumStats.albums.length;
+
+    let progressPercentage = 0;
+    if (totalAlbumsCount > 0) {
+      progressPercentage = (generatedAlbumsCount / totalAlbumsCount) * 100;
+    }
+
+    progressBarFilled.style.width = progressPercentage + '%';
+    progressText.textContent = generatedAlbumsCount + '/' + totalAlbumsCount + ' (' + progressPercentage.toFixed(2) + '%)';
   }
-
-  const generatedAlbumsCount = groupData.numberOfGeneratedAlbums + 1;
-  const totalAlbumsCount = albumStatsData.albums.length;
-
-  let progressPercentage = 0;
-  if (totalAlbumsCount > 0) {
-    progressPercentage = (generatedAlbumsCount / totalAlbumsCount) * 100;
-  }
-
-  progressBarFilled.style.width = progressPercentage + '%';
-
-  progressText.textContent = generatedAlbumsCount + '/' + totalAlbumsCount + ' (' + progressPercentage.toFixed(2) + '%)';
 }
 
 function makeQRCodes(currentAlbum) {
@@ -213,9 +243,6 @@ function generateStars(rating) {
         <svg class="star-svg" style="fill: url('#gradient${i}')">
         <polygon id="stars-polygon" points="${getStarPoints()}" style="fill-rule: nonzero" />
         <defs>
-          <!--
-			id has to be unique to each star fullness(dynamic offset) - it indicates fullness above
-		    -->
           <linearGradient id="gradient${i}">
             <stop
               id="stop1"
