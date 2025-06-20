@@ -9,13 +9,24 @@
   flex-direction: row;
 }
 
-.previous-album-container {
+.left-sidebar-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
   width: 20%;
   margin-left: 3rem;
+}
+
+.previous-album-top-spacer {
+  flex-grow: 1;
+}
+
+.previous-album-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 0;
 }
 
 .previous-content-title {
@@ -30,6 +41,7 @@
   padding: 1rem;
   border: 1px solid #a1a1a1;
   border-radius: 0.5rem;
+  /* flex-grow: 0; */
 }
 
 .previous-title-container {
@@ -168,8 +180,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 100%;
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
+  flex-grow: 1;
 }
 
 .progress-title {
